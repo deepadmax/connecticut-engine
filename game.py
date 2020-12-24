@@ -84,9 +84,23 @@ class Game:
     def is_connected(self, x, y):
         for px, py in self.get_hooks(x, y):
             if self[px, py] == self[px, py]:
-                pass
+                return True
+        return False
 
     # Areas / Regions
+
+    def get_hooks(self, x, y):
+        """ Get all 8 possible Horse moves """
+        
+        for i, j in (
+            (1, 2), (-1, 2), (1, -2), (-1, -2),
+            (2, 1), (2, -1), (-2, 1), (-1, -2)
+        ):
+            px = x + i
+            py = y + j
+
+            if 0 <= px < self.width and 0 <= py < self.height:
+                yield px, py
 
     def affected(self, x, y):
         n = 3
