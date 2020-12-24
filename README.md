@@ -1,2 +1,2 @@
-# connecticut-engine
-A board game played on a Go board with Go pieces.
+# Connecticut Engine for Python
+A library for running the board game Connecticut.
