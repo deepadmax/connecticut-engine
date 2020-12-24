@@ -1,5 +1,7 @@
 import numpy as np
 
+from brange import brange
+
 
 # Player colors
 BLACK = -1
@@ -17,10 +19,7 @@ class Game:
 
         # Board
         self.board = np.zeros((self.width, self.height))
-        self.available = (None,
-            np.zeros((self.width, self.height), dtype=bool), # Available white spots
-            np.zeros((self.width, self.height), dtype=bool)  # Available black spots
-        )
+        self.available = (None, set(), set())
 
     def __getitem__(self, xy):
         x, y = xy
@@ -40,7 +39,47 @@ class Game:
 
         # Loop through all ---
 
+    def is_blocked(self, a, b):
+        """ Check if two tiles are blocked by the other player """
+
+        # Separate each component
+        ax, ay = a
+        bx, by = b
+
+        color = self[ax, ay]
+
+        if color == 0:
+            raise RuntimeError("Can't check if path is blocked without a defined color")
         
+
+        # Distance between tiles
+        dx = bx - ax
+        dy = by - ay
+
+        # Polarity
+        plx = 1 if dx > 0 else -1
+        ply = 1 if dy > 0 else -1
+
+        if abs(dx) == abs(dy) or abs(dx) not in (1, 2) or abs(dy) not in (1, 2):
+            raise ValueError('Tiles must be a Horse move apart')
+
+        # Pick the two lines determining the connection
+        if abs(dx) > abs(dy):
+            u = self[ax:bx - plx, by]
+            v = self[ax + plx:bx, ay]
+        else:
+            u = self[bx, ay:by - ply]
+            v = self[ax, ay + ply:by]
+
+        # Check whether either of the lines
+        # is blocked by a piece of the opponent's color
+        
+        u_blocked = any(i == -color for i in u)
+        v_blocked = any(j == -color for j in v)
+
+        if u_blocked and v_blocked:
+            return True
+        return False
 
     def is_connected(self, x, y):
         for px, py in self.get_hooks(x, y):
